@@ -13,9 +13,9 @@ const createUser = async (req, res) => {
 }
 
 const getUser = async (req, res) => {
-    const { id } = req.params;
+    const { username } = req.params;
     try {
-        const user = await User.findById(id);
+        const user = await User.findOne({ username });
         res.status(200).json(user);
     } catch (error) {
         res.status(404).json({ message: error.message });
