@@ -3,14 +3,14 @@ import { createUser, getUser, getAllUsers, updateUser, deleteUser } from '../con
 
 const router = Router();
 
-router.post('/', createUser);
+router.post('/user', createUser);
 
-router.get('/', getAllUsers);
+router.get('/users', getAllUsers);
 
-router.get('/:id', getUser);
+router.get('/user/:username', getUser);
 
-router.patch('/:username', updateUser);
+router.patch('/user/:username', updateUser);
 
-router.delete('/:username', deleteUser);
+router.delete('/user/:username', deleteUser);
 
 export default router;

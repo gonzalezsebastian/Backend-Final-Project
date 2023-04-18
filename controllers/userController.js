@@ -16,6 +16,7 @@ const getUser = async (req, res) => {
     const { username } = req.params;
     try {
         const user = await User.findOne({ username });
+        if (!user) throw new Error('User not found');
         res.status(200).json(user);
     } catch (error) {
         res.status(404).json({ message: error.message });
@@ -35,7 +36,7 @@ const updateUser = async (req, res) => {
     const { username } = req.params;
     const { first_name, second_name, email, password, phone, address } = req.body;
     try {
-        User.findByIdAndUpdate(username, {
+        User.findOneAndUpdate(username, {
             first_name,
             second_name,
             email,
@@ -53,7 +54,7 @@ const updateUser = async (req, res) => {
 const deleteUser = async (req, res) => {
     try {
         const { username } = req.params;
-        const user = await User.findByIdAndUpdate(username, { isDeleted: true });
+        const user = await User.findOneAndUpdate(username, { isDeleted: true });
         if (!user) {
             res.status(404).send({ message: "User not found." });
             return;
