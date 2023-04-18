@@ -3,7 +3,6 @@ import mongoose from 'mongoose';
 const RestaurantSchema = new mongoose.Schema({
   adminID: { type: String, required: true },
   name: { type: String, required: true},
-  description: { type: String },
   address: { 
     street: { type: String, required: true},
     number: { type: String, required: true},

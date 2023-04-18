@@ -8,6 +8,7 @@ const port = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use('/user', userRoutes);
+app.use('/restaurant', restaurantRoutes);
 
 app.get('/', (req, res) => {
     res.send('Hello World!');
@@ -25,7 +26,7 @@ mongoose
         ':' +
         process.env.MONGO_PASS +
         '@cluster0.i7ggasq.mongodb.net/?retryWrites=true&w=majority',
-    {
+    { 
         useNewUrlParser: true,
         useUnifiedTopology: true,
     }
