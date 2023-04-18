@@ -1,8 +1,8 @@
 import moongose from 'mongoose';
 
 const ProductSchema = new moongose.Schema({
-  idRestaurant: { type: String, required: true },
-  nameRestaurant: { type: String, required: true },
+  restaurantID: { type: String, required: true },
+  restaurantName: { type: String, required: true },
   name: { type: String, required: true },
   description: { type: String, required: true },
   category: { type: String, required: true },
