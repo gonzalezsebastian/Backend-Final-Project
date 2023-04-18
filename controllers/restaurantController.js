@@ -2,8 +2,8 @@ import Restaurant from "../models/restaurantModel.js";
 import mongoose from "mongoose";
 
 const createRestaurant = async (req, res) => {
-    const { adminID, name, address, phone, email, category } = req.body;
-    const restaurant = new Restaurant({ adminID, name, address, phone, email, category });
+    const { adminID, restaurantID, name, address, phone, email, category } = req.body;
+    const restaurant = new Restaurant({ adminID, restaurantID, name, address, phone, email, category });
     try {
         await restaurant.save();
         res.status(201).json(restaurant);
@@ -31,6 +31,7 @@ const getAllRestaurants = async (req, res) => {
         res.status(404).json({ message: error.message });
     }
 }
+
 
 const updateRestaurant = async (req, res) => {
     const { restaurantID } = req.params;

@@ -1,6 +1,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import userRoutes from './routes/userRoutes.js';
+import restaurantRoutes from './routes/restaurantRoutes.js';
 
 // Creacion del app
 const app = express();
@@ -15,7 +16,7 @@ app.get('/', (req, res) => {
 });
 
 app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
+    console.log(`Server running on port http://localhost:${port}`);
 });
 
 // Conexión a MongoDB usando mongoose
