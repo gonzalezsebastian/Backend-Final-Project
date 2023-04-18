@@ -2,6 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import userRoutes from './routes/userRoutes.js';
 import restaurantRoutes from './routes/restaurantRoutes.js';
+import productRoutes from './routes/productRoutes.js';
 
 // Creacion del app
 const app = express();
@@ -10,6 +11,7 @@ const port = process.env.PORT || 3000;
 app.use(express.json());
 app.use('/user', userRoutes);
 app.use('/restaurant', restaurantRoutes);
+app.use('/product', productRoutes);
 
 app.get('/', (req, res) => {
     res.send('Hello World!');
