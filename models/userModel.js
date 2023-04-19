@@ -15,7 +15,7 @@ const UserSchema = new mongoose.Schema({
     zip: { type: String, required: true},
     extraInformation: { type: String }
   },
-  role: { type: String, default: 'client'},
+  role: { type: String, enum: ['delivery man', 'client', 'admin'], required: true },
   isDeleted: { type: Boolean, default: false },
 });
 
