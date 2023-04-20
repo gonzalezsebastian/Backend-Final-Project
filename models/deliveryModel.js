@@ -1,12 +1,13 @@
 import mongoose from 'mongoose';
+const Schema = mongoose.Schema;
 
 const DeliverySchema = new mongoose.Schema(
   {
-    restaurantID: { type: String, required: true },
-    username: { type: String, required: true },
-    deliveryUsername: { type: String, required: true },
-    total: { type: Number, required: true },
-    status: { type: String, default: 'pending' },
+    restaurantID: { type: Schema.Types.ObjectId, required: true },
+    username: { type: Schema.Types.ObjectId, required: true },
+    deliveryUsername: { type: Schema.Types.ObjectId, required: true },
+    total: { type: Number },
+    status: { type: String, default: 'Created' },
     products: {
       type: [
         {
