@@ -15,7 +15,31 @@ Clone the repository in your local desk.
 ```
 npm i
 ```
-4. Run it
+4. Create nodemon.json file in this direction
+ * [controllers]
+ * [models]
+ * [node_modules]
+ * [routes]
+ * [.babelrc]
+ * [.gitignore]
+ * [app.js]
+ * [**nodemon.json**]
+ * [package.json]
+ * [README.md]
+ 
+Write in nodemon.json the access credentials to your database in mongodb
+```
+{
+	"env": {
+
+		"MONGO_USER": "your_user",
+
+		"MONGO_PASS": "your_password"
+
+	}
+}
+```
+5. Open a new terminal and run it
 ```
 npm run start
 ```
