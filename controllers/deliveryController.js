@@ -96,6 +96,9 @@ const calculateTotal = async (products) => {
     let total = 0;
     products.map(async (product) => {
         const productFound = await Product.findById(product.productID);
+        if (!productFound) {
+            res.status(404).json({ message: error.message+` Product ${product.productID} not found.` });
+        }
         total += productFound.price * product.quantity;
     });
     return total;
