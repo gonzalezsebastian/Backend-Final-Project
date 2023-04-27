@@ -4,10 +4,10 @@ const Schema = mongoose.Schema;
 const DeliverySchema = new mongoose.Schema(
   {
     restaurantID: { type: Schema.Types.ObjectId, required: true },
-    username: { type: Schema.Types.ObjectId, required: true },
-    deliveryUsername: { type: Schema.Types.ObjectId, required: true },
+    username: { type: Schema.Types.ObjectId, ref: 'User',required: true },
+    deliveryUsername: { type: Schema.Types.ObjectId, ref: 'User',required: true },
     total: { type: Number },
-    status: { type: String, default: 'Created' },
+    status: { type: String, enum: ['Created','Sent', 'Accepted', 'Received', 'Arrived', 'Finished'], default: 'Created' },
     products: {
       type: [
         {
@@ -15,8 +15,8 @@ const DeliverySchema = new mongoose.Schema(
           quantity: {type: Number, required: true},
         },
       ],
-      unique: true,
     },
+    createdAt: { type: Date, immutable: true, default: Date.now },
     isDeleted: { type: Boolean, default: false },
   },
   { timestamps: true }

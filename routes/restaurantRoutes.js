@@ -5,9 +5,9 @@ const router = Router();
 
 router.post('/', createRestaurant);
 
-router.get('/restaurants', getAllRestaurants);
+router.get('/', getRestaurant);
 
-router.get('/:restaurantID', getRestaurant);
+router.get('/restaurants', getAllRestaurants);
 
 router.patch('/:restaurantID', updateRestaurant);
 

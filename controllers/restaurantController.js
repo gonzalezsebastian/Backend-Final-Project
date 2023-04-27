@@ -1,25 +1,34 @@
 import Restaurant from "../models/restaurantModel.js";
-import mongoose from "mongoose";
 
 const createRestaurant = async (req, res) => {
-    const { adminID, restaurantID, name, address, phone, email, category } = req.body;
-    const restaurant = new Restaurant({ adminID, restaurantID, name, address, phone, email, category });
-    try {
-        await restaurant.save();
-        res.status(201).json(restaurant);
+    try{
+        const { admin, restaurantID, name, address, phone, categories } = req.body;
+        const restaurant = new Restaurant({ admin, restaurantID, name, address, phone, categories });
+        const newRestaurant = await restaurant.save();
+        res.status(200).json(newRestaurant);
     } catch (error) {
-        res.status(409).json({ message: error.message });
+        res.status(500).json({ message: error.message });
     }
 };
 
 const getRestaurant = async (req, res) => {
-    const { restaurantID } = req.params;
-    try {
-        const restaurant = await Restaurant.findOne({ restaurantID });
-        if (!restaurant) throw new Error("Restaurant not found");
-        res.status(200).json(restaurant);
+    const { restaurantID, name, category } = req.query;
+    const query = { isDeleted: false };
+    if (restaurantID) {
+        query.restaurantID = restaurantID;
+    }
+    if (name && category) {
+        query.name = name;
+        query.categories = { $elemMatch: { $eq: category }};
+    }
+    try{
+        const restaurants = await Restaurant.find(query).sort({ rating: -1 });
+        res.status(200).json(restaurants);
+        if(!restaurants){
+            return res.status(404).json({ message: "The restaurant does not exists" });     
+        }
     } catch (error) {
-        res.status(404).json({ message: error.message });
+        res.status(500).json({ message: error.message });
     }
 };
 
@@ -35,21 +44,30 @@ const getAllRestaurants = async (req, res) => {
 
 const updateRestaurant = async (req, res) => {
     const { restaurantID } = req.params;
-    const { adminID, name, address, phone, email, category } = req.body;
+    const { admin, name, address, phone, categories } = req.body;
     try {
-        Restaurant.findOneAndUpdate(restaurantID, {
-            adminID,
-            name,
-            address,
-            phone,
-            email,
-            category
-        }).exec();
+        const updatedRestaurant = await Restaurant.findOneAndUpdate(
+            { restaurantID: restaurantID, isDeleted: false },
+            {
+                $set: {
+                    admin,
+                    name,
+                    address,
+                    phone,
+                    email,
+                    categories,
+                }
+            },
+            { new: true }
+        );
+        if (!updatedRestaurant) {
+            return res.status(404).send({ message: "Restaurant not found." });
+        }
+        return res.status(200).json(updatedRestaurant);
     } catch (err) {
         res.status(500).send({ message: err.message });
         return;
     }
-    res.status(200).send({ message: "Restaurant was updated successfully." });
 };
 
 const deleteRestaurant = async (req, res) => {
@@ -57,10 +75,10 @@ const deleteRestaurant = async (req, res) => {
         const { restaurantID } = req.params;
         const restaurant = await Restaurant.findOneAndUpdate(restaurantID, { isDeleted: true });
         if (!restaurant) {
-            res.status(404).send({ message: "Restaurant not found." });
+            res.status(404).send({ message: `Restaurant ${restaurantID} not found` });
             return;
         }
-        res.status(200).send({ message: "Restaurant was deleted successfully." });
+        res.status(200).send({ message: `Restaurant ${restaurantID} was deleted successfully.` });
     } catch (err) {
         res.status(500).send({ message: err.message });
     }

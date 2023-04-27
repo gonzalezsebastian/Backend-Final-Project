@@ -1,59 +1,63 @@
 import Delivery from "../models/deliveryModel.js";
 import Product from "../models/productModel.js";
+import Restaurant from "../models/restaurantModel.js";
 import mongoose from "mongoose";
 
 const createDelivery = async (req, res) => {
     const { restaurantID, username, products } = req.body;
     try{
         if (!sameRestaurant(products, restaurantID)) {
-            res.status(400).json({ message: "Products must be from the same restaurant." });
-            return;
+            return res.status(400).json({ message: "Products must be from the same restaurant." });
         }
         const total = await calculateTotal(products);
         const delivery = new Delivery({ restaurantID, username, products, total });
         await delivery.save();
+        // Increment restaurant rating by 1
+        await Restaurant.findOneAndUpdate({ restaurantID: restaurantID }, { $inc: { rating: 1 } });
         res.status(201).json(delivery);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
 
-const getDelivery = async (req, res) => {
-    const { deliveryID, username } = req.query;
+const getDeliverybyID = async (req, res) => {
+    const { _id } = req.params;
     try {
-        if(deliveryID){
-            const delivery = await Delivery.findOne({ deliveryID });
-            if(!delivery) return res.status(400).json({ message: 'Deliver not found: Check delivery ID' });;
-            res.status(200).json(delivery);
-        } else if(username){
-            const deliverys = await Delivery.aggregate([
-                {
-                    $match: {
-                        isDeleted: false,
-                        $or: [
-                            { username: mongoose.Types.ObjectId(username) },
-                        ],
-                    },
-                },
-                {
-                    $project: {
-                        _id: 1,
-                        restaurantID: 1,
-                        username: 1,
-                        products: 1,
-                        total: 1,
-                        status: 1,
-                        timestamp: 1,
-                    },
-                }
-            ]);
-            if(!deliverys) return res.status(400).json({ message: 'Delivery not found: Check username' });
-            res.status(200).json(deliverys);
+        const delivery = await Delivery.findById(_id);
+        if (!delivery) {
+            res.status(404).json({ message: "Delivery not found." });
         } else {
-            res.status(400).json({ message: "Bad request" });
+            res.status(200).json(delivery);
         }
     } catch (error) {
         res.status(404).json({ message: error.message });
+    }
+};
+
+const getDeliverybyFilters = async (req, res) => {
+    try {
+        const { restaurantID, username, deliveryUsername, startDate, endDate } = req.query;
+
+        const query = { isDeleted: false };
+        if (restaurantID) query.restaurantID = restaurantID;
+        if (username) query.username = username;
+        if (deliveryUsername) query.deliveryUsername = deliveryUsername;
+        if (startDate && endDate) query.createdAt = { $gte: startDate, $lte: endDate };
+
+        const deliveries = Delivery.find(query);
+        res.status(200).json(deliveries);
+
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+const getNotAcceptedDeliverys = async (req, res) => {
+    try {
+        const deliveries = await Delivery.find({ status: 'Sent' }, { isDeleted: false });
+        res.status(200).json(deliveries);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
     }
 };
 
@@ -67,21 +71,35 @@ const getAllDeliverys = async (req, res) => {
 };
 
 const updateDelivery = async (req, res) => {
-    const { deliveryID } = req.params;
-    const { status } = req.body;
+    const { _id } = req.params;
+    const { username, deliveryUsername, restaurantID, products, status } = req.body;
     try {
-        if(!checkStatus(status)) return res.status(400).json({ message: 'Invalid status: Can set status to Created' });;
-        Delivery.findOneAndUpdate(deliveryID, { status }).exec();
-        res.status(200).json({ message: "Delivery updated successfully." });
+        const updatedDelivery = await Delivery.findByIdAndUpdate(
+            { _id: _id, isDeleted: false, status: 'Created' },
+            {
+                $set: {
+                    username,
+                    deliveryUsername,
+                    restaurantID,
+                    products,
+                    status,
+                },
+            },
+            { new: true }
+        );
+        if (!updatedDelivery) {
+            return res.status(404).json({ message: "Delivery not found." });
+        }
+        res.status(200).json(updatedDelivery);
     } catch (error) {
-        res.status(404).json({ message: error.message });
+        res.status(500).json({ message: error.message });
     }
 };
 
 const deleteDelivery = async (req, res) => {
     try {
-        const { deliveryID } = req.params;
-        const delivery = await Delivery.findOneAndUpdate(deliveryID, { isDeleted: true });
+        const { _id } = req.params;
+        const delivery = await Delivery.findOneAndUpdate(_id, { isDeleted: true });
         if (!delivery) {
             res.status(404).send({ message: "Delivery not found." });
         } else {
@@ -109,8 +127,4 @@ const sameRestaurant = (products, restaurantID) => {
                    .every((isSame) => isSame);
 };
 
-const checkStatus = (status) => {
-    return status === 'Created' ? false : true;
-};
-
-export { createDelivery, getDelivery, getAllDeliverys, updateDelivery, deleteDelivery }
+export { createDelivery, getDeliverybyID, getDeliverybyFilters, getNotAcceptedDeliverys, getAllDeliverys, updateDelivery, deleteDelivery }
