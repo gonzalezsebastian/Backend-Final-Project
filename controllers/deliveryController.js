@@ -10,7 +10,7 @@ const createDelivery = async (req, res) => {
             return res.status(400).json({ message: "Products must be from the same restaurant." });
         }
         const total = await calculateTotal(products);
-        const distance = Math.floor(Math.random() * (1000 - 100) + 100);
+        const distance = (Math.random() * (5000)).toFixed(2);
         const delivery = new Delivery({ restaurantID, username, products, total, distance });
         await delivery.save();
         // Increment restaurant rating by 1
