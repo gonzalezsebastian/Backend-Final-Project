@@ -16,6 +16,7 @@ const DeliverySchema = new mongoose.Schema(
         },
       ],
     },
+    distance: { type: Number, immutable: true, default: 0 },
     createdAt: { type: Date, immutable: true, default: Date.now },
     isDeleted: { type: Boolean, default: false },
   },

@@ -10,7 +10,8 @@ const createDelivery = async (req, res) => {
             return res.status(400).json({ message: "Products must be from the same restaurant." });
         }
         const total = await calculateTotal(products);
-        const delivery = new Delivery({ restaurantID, username, products, total });
+        const distance = Math.floor(Math.random() * (1000 - 100) + 100);
+        const delivery = new Delivery({ restaurantID, username, products, total, distance });
         await delivery.save();
         // Increment restaurant rating by 1
         await Restaurant.findOneAndUpdate({ restaurantID: restaurantID }, { $inc: { rating: 1 } });
@@ -36,7 +37,7 @@ const getDeliverybyID = async (req, res) => {
 
 const getDeliverybyFilters = async (req, res) => {
     try {
-        const { restaurantID, username, deliveryUsername, startDate, endDate } = req.query;
+        const { restaurantID, username, deliveryUsername, startDate, endDate, sortbyDistance } = req.query;
 
         const query = { isDeleted: false };
         if (restaurantID) query.restaurantID = restaurantID;
@@ -45,6 +46,8 @@ const getDeliverybyFilters = async (req, res) => {
         if (startDate && endDate) query.createdAt = { $gte: startDate, $lte: endDate };
 
         const deliveries = Delivery.find(query);
+        if (sortbyDistance) query.sort({ distance: 1 });
+
         res.status(200).json(deliveries);
 
     } catch (error) {
