@@ -1,7 +1,7 @@
-import moongose from 'mongoose';
+import mongoose from 'mongoose';
 
-const ProductSchema = new moongose.Schema({
-  restaurantID: { type: String, required: true },
+const ProductSchema = new mongoose.Schema({
+  restaurantID: { type: mongoose.Schema.Types.ObjectId, ref: 'Restaurant', required: true },
   name: { type: String, required: true },
   description: { type: String, required: true},
   category: { type: String, required: true },
@@ -11,6 +11,6 @@ const ProductSchema = new moongose.Schema({
   isDeleted: { type: Boolean, default: false },
 });
 
-const Product = moongose.model('Product', ProductSchema);
+const Product = mongoose.model('Product', ProductSchema);
 
 export default Product;

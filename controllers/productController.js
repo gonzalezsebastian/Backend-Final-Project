@@ -14,12 +14,12 @@ const createProduct = async (req, res) => {
         if (productStatus === null) {
             return res.status(400).json({ message: 'Invalid available quantity' });
         }
-
-        const product = new Product({ restaurantID, name, description, availableQuantity, category, price});
+        
+        const product = new Product({ restaurantID, name, description, availableQuantity, category, price, productStatus});
         await product.save();
         if (restaurantID){
             const updatedRestaurant = await Restaurant.findOneAndUpdate(
-                { restaurantID: restaurantID, isDeleted: false },
+                { _id: restaurantID, isDeleted: false },
                 {
                     $push: {
                         products: product.name,
@@ -57,23 +57,22 @@ const getProductbyID = async (req, res) => {
 }
 
 const getProductbyRestaurantID = async (req, res) => {
-    const { restaurantID, category } = req.body;
-    const query = { restaurantID: restaurantID, isDeleted: false };
-    if (restaurantID) {
-        query.restaurantID = restaurantID;
-    }
-    if (category) {
-        query.category = category;
-    }
     try {
-        const products = await Product.find(query);
-        if (!products) {
-            res.status(404).send({ message: "Products not found." });
+        const { restaurantID, category } = req.query;
+        let product;
+        if (restaurantID && category) {
+            product = await Product.findOne({ restaurantID: restaurantID, categories: { $elemMatch: { $in: [category] }} });
+        } else {
+            res.status(400).json({ message: "Bad request" });
             return;
         }
-        res.status(200).json(products);
-    } catch (err) {
-        res.status(500).send({ message: err.message });
+        if (!product) {
+            res.status(404).json({ message: "The Restaurant does not exists or the name/category do not match" });
+            return;
+        }
+        res.status(200).json(product);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
     }
 };
 
@@ -106,14 +105,13 @@ const updateProduct = async (req, res) => {
 
         if(name){
             const updatedRestaurant = await Restaurant.findOneAndUpdate(
-                { restaurantID: updatedProduct.restaurantID, isDeleted: false },
+                { restaurantID: updatedProduct.restaurantID, isDeleted: false, "products": {$regex: updatedProduct.name, $options: 'i'} },
                 {
                     $set: {
-                        "products.$[element]": name,
+                        "products.$": name,
                     },
                 },
                 {
-                    arrayFilters: [{ "element": updatedProduct.name }],
                     new: true
                 }
             );
