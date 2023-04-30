@@ -75,4 +75,4 @@ const deleteUser = async (req, res) => {
     res.send({ message: `User ${username} was deleted successfully` });
 }
 
-export { createUser, getUser, getAllUsers, updateUser, deleteUser };
+export { createUser, getUser, updateUser, deleteUser };
