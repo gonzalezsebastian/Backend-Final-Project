@@ -78,7 +78,7 @@ const deleteRestaurant = async (req, res) => {
             res.status(404).send({ message: `Restaurant ${restaurantID} not found` });
             return;
         }
-        res.status(200).send({ message: `Restaurant ${restaurantID} was deleted successfully.` });
+        res.status(200).send({ message: `Restaurant was deleted successfully.` });
     } catch (err) {
         res.status(500).send({ message: err.message });
     }
