@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const DeliverySchema = new mongoose.Schema(
   {
-    restaurantID: { type: Schema.Types.ObjectId, required: true },
+    restaurantID: { type: Schema.Types.ObjectId, ref: 'Restaurant', required: true },
     username: { type: Schema.Types.ObjectId, ref: 'User',required: true },
     deliveryUsername: { type: Schema.Types.ObjectId, ref: 'User',required: true },
     total: { type: Number },

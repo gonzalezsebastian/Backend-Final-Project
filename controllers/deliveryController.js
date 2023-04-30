@@ -15,6 +15,8 @@ const createDelivery = async (req, res) => {
         await delivery.save();
         // Increment restaurant rating by 1
         await Restaurant.findOneAndUpdate({ restaurantID: restaurantID }, { $inc: { rating: 1 } });
+        //Update availability of products
+        await Product.updateMany({ _id: { $in: products.map((product) => product.productID) } }, { $inc: { quantity: -1 } });
         res.status(201).json(delivery);
     } catch (error) {
         res.status(500).json({ message: error.message });
