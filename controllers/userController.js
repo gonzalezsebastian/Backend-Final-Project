@@ -72,7 +72,7 @@ const deleteUser = async (req, res) => {
     } catch (err){
         return res.status(500).send({ message: err.message });
     }
-    res.send({ message: `User ${username} was deleted successfully` });
+    res.send({ message: `User was deleted successfully` });
 }
 
 export { createUser, getUser, updateUser, deleteUser };
