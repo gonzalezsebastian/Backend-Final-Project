@@ -1,11 +1,9 @@
 import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 
-const DeliverySchema = new mongoose.Schema(
+const OrderSchema = new mongoose.Schema(
   {
-    restaurantID: { type: Schema.Types.ObjectId, ref: 'Restaurant', required: true },
     username: { type: Schema.Types.ObjectId, ref: 'User',required: true },
-    deliveryUsername: { type: Schema.Types.ObjectId, ref: 'User',required: true },
     total: { type: Number },
     status: { type: String, enum: ['Created','Sent', 'Accepted', 'Received', 'Arrived', 'Finished'], default: 'Created' },
     products: {
@@ -23,6 +21,6 @@ const DeliverySchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Delivery = mongoose.model('Delivery', DeliverySchema);
+const Order = mongoose.model('Order', OrderSchema);
 
-export default Delivery;
+export default Order;
