@@ -2,7 +2,7 @@
 ## Delivery App
 ### Description
 
-Project made for the course "Backend Web Development" at Universidad del Norte. It's an application that functions similar to most food delivery applications. It is made with Node, JavaScript, Express and MongoDB.
+Mercurio, Project made for the course "Backend Web Development" at Universidad del Norte. It's an application that functions similar to E-commerce . It is made with Node, TypeScript, Express and MongoDB.
 
 ## Installation
 Clone the repository in your local desk.
