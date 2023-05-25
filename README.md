@@ -1,5 +1,5 @@
-# Backend First Project
-## Delivery App
+# Backend Final Project
+## E-commerce App
 ### Description
 
 Mercurio, Project made for the course "Backend Web Development" at Universidad del Norte. It's an application that functions similar to E-commerce . It is made with Node, TypeScript, Express and MongoDB.
@@ -22,7 +22,7 @@ npm i
  * [routes]
  * [.babelrc]
  * [.gitignore]
- * [app.js]
+ * [app.ts]
  * [**nodemon.json**]
  * [package.json]
  * [README.md]
