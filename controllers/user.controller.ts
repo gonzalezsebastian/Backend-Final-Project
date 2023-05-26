@@ -45,12 +45,11 @@ export const userLogin = async (req: Request, res: Response, next: NextFunction)
             password: user.password
         });
 
-        res.cookie('token', token,{ 
-            httpOnly: true, 
+        res.cookie('token', token, {
+            httpOnly: true,
             sameSite: 'none',
-            secure: true 
-        }).
-        status(200).json({ message: 'User logged in successfully' });
+            secure: true
+        }).status(200).json({ message: 'User logged in successfully' });
 
     }catch(err){
         next(err);
