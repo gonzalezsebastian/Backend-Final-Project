@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 const ProductSchema = new mongoose.Schema(
     {
+        sellerID: { type: "String", immutable: true, required: true },
         name: { type: String, required: true },
         description: { type: String, required: true },
         category: { type: String, required: true },
@@ -22,6 +23,10 @@ ProductSchema.pre("find", function () {
 });
 
 ProductSchema.pre("findOne", function () {
+    this.where({ isDeleted: { $ne: true } });
+});
+
+ProductSchema.pre("findOneAndUpdate", function () {
     this.where({ isDeleted: { $ne: true } });
 });
 

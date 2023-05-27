@@ -8,7 +8,7 @@ router.post("/create", isLogged, productController.createProduct);
 
 router.get("/:id", productController.getProductByID);
 
-router.get("/", productController.getProducts);
+router.get("/:email", productController.getProducts);
 
 router.get("/category/:category", productController.getProductsByCategory);
 

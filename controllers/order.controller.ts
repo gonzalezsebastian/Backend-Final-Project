@@ -23,9 +23,7 @@ const getOrderByID = async (req: Request, res: Response) => {
 
 const getOrdersByEmail = async (req: Request, res: Response) => {
     const { email } = req.params;
-    const filter = req.query ?? {};
-    const startDate = filter.startDate ?? new Date(0);
-    const endDate = filter.endDate ?? new Date();
+    const { startDate = new Date(0), endDate = new Date() } = req.query;
     try {
         const orders = await OrderModel.find({
             $or: [
