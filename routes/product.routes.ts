@@ -15,3 +15,5 @@ router.get("/category/:category", productController.getProductsByCategory);
 router.patch("/:id", isLogged, productController.updateProduct);
 
 router.delete("/:id", isLogged, productController.deleteProduct);
+
+export default router;

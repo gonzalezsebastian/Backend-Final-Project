@@ -1,30 +1,23 @@
-import { NextFunction, Request, Response } from "express";
-import { compare, genSaltSync, hash } from "bcrypt";
+import { Request, Response } from "express";
+import { hash as a2Hash, verify as a2Verify } from "argon2";
 import * as jwt from "jsonwebtoken";
 import { login, user } from "../types/user";
 import { ExtendedRequest } from "../types/user";
 
-export const hashPassword = async (password: string) => {
-    const salt = await genSaltSync();
-    return await hash(password, salt);
-};
+export const hashPassword = async (password: string) => await a2Hash(password);
 
 export const comparePassword = async (
     password: string,
     hash: string
 ): Promise<boolean> => {
-    return await compare(password, hash);
+    return await a2Verify(password, hash);
 };
 
 export const generateToken = (payload: login) => {
     return jwt.sign(payload, process.env.JWT_SECRET || "", { expiresIn: "1h" });
 };
 
-export const verifyToken = (
-    req: ExtendedRequest,
-    res: Response,
-    next: NextFunction
-) => {
+export const verifyToken = (req: ExtendedRequest, res: Response) => {
     if (!req.cookies?.token) {
         return res
             .status(401)
@@ -42,7 +35,6 @@ export const verifyToken = (
             }
 
             req.user = decoded as user;
-            next();
         }
     );
 };

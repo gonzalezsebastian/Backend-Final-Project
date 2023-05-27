@@ -1,8 +1,11 @@
 import express from "express";
-import { userRoutes, orderRoutes } from "./routes";
+import mongoose, { ConnectOptions } from "mongoose";
+import dotenv from "dotenv";
+import { userRoutes, orderRoutes, productRoutes } from "./routes";
 import cors from "express";
 
-// Creacion del app
+dotenv.config();
+
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -17,3 +20,18 @@ app.listen(port, () => {
 app.use("/users", userRoutes);
 app.use("/orders", orderRoutes);
 app.use("/products", productRoutes);
+
+const connectOptions: ConnectOptions = {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+} as any;
+
+mongoose
+    .connect(process.env.DATABASE || "", connectOptions)
+    .then(() => {
+        console.log("Connected to MongoDB!");
+    })
+    .catch((err) => {
+        console.log("There was an error with connection!");
+        console.log(err);
+    });
