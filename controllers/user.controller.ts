@@ -1,7 +1,7 @@
 import User from '../models/user.model';
 import { Request, Response, NextFunction } from 'express';
 import { hashPassword, comparePassword, generateToken } from '../utils/jwt';
-import { login, user, updateUserType } from '../types/user';
+import { login, ExtendedRequest, updateUserType } from '../types/user';
 import mongoose from 'mongoose';
 
 export const createUser = async (req: Request, res: Response, next: NextFunction) => {
@@ -73,7 +73,7 @@ export const getUser = async (req: Request, res: Response, next: NextFunction) =
     }
 };
 
-export const updateUser = async (req: Request, res: Response, next: NextFunction) => {
+export const updateUser = async (req: ExtendedRequest, res: Response, next: NextFunction) => {
     const { id } = req.params;
     const { first_name, second_name, email, password, phone, address }:updateUserType = req.body;
 
@@ -105,7 +105,7 @@ export const updateUser = async (req: Request, res: Response, next: NextFunction
     }
 };
 
-export const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
+export const deleteUser = async (req: ExtendedRequest, res: Response, next: NextFunction) => {
     const { id } = req.params;
     
     try{
