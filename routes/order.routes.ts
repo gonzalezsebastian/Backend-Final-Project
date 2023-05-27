@@ -1,15 +1,15 @@
 import { Router } from "express";
-import { OrderController } from "../controllers";
+import { orderController } from "../controllers";
 import { isLogged } from "../middlewares/auth";
 
 const router = Router();
 
-router.post("/create", isLogged, OrderController.createOrder);
+router.post("/create", isLogged, orderController.createOrder);
 
-router.get("/:id", isLogged, OrderController.getOrderByID);
+router.get("/:id", isLogged, orderController.getOrderByID);
 
-router.get("/:email", isLogged, OrderController.getOrdersByEmail);
+router.get("/:email", isLogged, orderController.getOrdersByEmail);
 
-router.patch("/:id", isLogged, OrderController.updateOrder);
+router.patch("/:id", isLogged, orderController.updateOrder);
 
 export default router;
