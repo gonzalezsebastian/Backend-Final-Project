@@ -1,6 +1,9 @@
+import { Request } from "express";
+
 export type user = {
     first_name: string;
     second_name: string;
+    last_names: string;
     email: string;
     password: string;
     phone: string;
@@ -12,11 +15,14 @@ export type user = {
         zip: string;
         extraInformation: string;
     };
-}
+};
 
 export type updateUserType = Partial<user>;
 
-export interface login{
+export interface ExtendedRequest extends Request {
+    user?: user;
+}
+export interface login {
     email: string;
     password: string;
 }
