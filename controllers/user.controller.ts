@@ -3,7 +3,7 @@ import { Request, Response, NextFunction } from "express";
 import { hashPassword, comparePassword, generateToken } from "../utils/jwt";
 import { login, ExtendedRequest, updateUserType } from "../types/user";
 
-const createUser = async (req: Request, res: Response) => {
+export const createUser = async (req: Request, res: Response) => {
     try {
         const { first_name, second_name, email, password, phone, address } =
             req.body;
@@ -19,26 +19,25 @@ const createUser = async (req: Request, res: Response) => {
             address: address,
         });
 
-        res.status(201).json({ message: "User created", data: user });
+        return res.status(201).json({ message: "User created", data: user });
     } catch (err) {
-        res.send(500).json({ message: "Server error", err });
+        return res.status(500).json({ message: "User not created", err });
     }
 };
 
-const userLogin = async (req: Request, res: Response) => {
+export const userLogin = async (req: Request, res: Response) => {
     const { email, password }: login = req.body;
     try {
         const user = await User.findOne({ email: email });
 
         if (!user) {
-            res.send(500).json({ message: "User not found", statusCode: 404 });
+            return res.status(404).json({ message: "User not found" });
         }
 
         const isPasswordValid = await comparePassword(password, user!.password);
         if (!isPasswordValid) {
-            res.send(500).json({
-                message: "Invalid credentials",
-                statusCode: 401,
+            return res.status(401).json({
+                message: "Invalid credentials"
             });
         }
 
@@ -47,7 +46,7 @@ const userLogin = async (req: Request, res: Response) => {
             password: user!.password,
         });
 
-        res.cookie("token", token, {
+        return res.cookie("token", token, {
             httpOnly: true,
             sameSite: "none",
             secure: true,
@@ -55,27 +54,27 @@ const userLogin = async (req: Request, res: Response) => {
             .status(200)
             .json({ message: "User logged in successfully" });
     } catch (err) {
-        res.send(500).json({ message: "Server error", err });
+        return res.status(500).json({ message: "Server error", err });
     }
 };
 
-const getUserByID = async (req: Request, res: Response, next: NextFunction) => {
+export const getUserByID = async (req: Request, res: Response) => {
     const { id } = req.params;
 
     try {
-        const user = await User.findOne({ _id: id }, { password: 0 });
+        const user = await User.findOne({ _id: id });
 
         if (!user) {
-            return res.send(404).json({ message: "User not found" });
+            return res.status(404).json({ message: "User not found" });
         }
 
-        res.status(200).json({ message: "User found", data: user });
+        return res.status(200).json({ message: "User found", data: user });
     } catch (err) {
-        res.send(500).json({ message: "Server error", err });
+        return res.status(500).json({ message: "Server error", err });
     }
 };
 
-const getToken = async (req: ExtendedRequest, res: Response) => {
+export const getToken = async (req: ExtendedRequest, res: Response) => {
     const { email, password }: login = req.body;
     let token = null;
     try {
@@ -84,12 +83,12 @@ const getToken = async (req: ExtendedRequest, res: Response) => {
             password: password,
         });
     } catch (err) {
-        res.send(500).json({ message: "Server error", err });
+        return res.status(500).json({ message: "Server error", err });
     }
-    res.send(200).json({ message: "Token generated", token: token });
+    return res.status(200).json({ message: "Token generated", token: token });
 };
 
-const updateUser = async (req: ExtendedRequest, res: Response) => {
+export const updateUser = async (req: ExtendedRequest, res: Response) => {
     const { id } = req.params;
     const {
         first_name,
@@ -106,7 +105,7 @@ const updateUser = async (req: ExtendedRequest, res: Response) => {
         if (!user) {
             return res
                 .status(404)
-                .json({ message: "User not found", statusCode: 404 });
+                .json({ message: "User not found" });
         }
 
         if (req.user?.email !== user.email) {
@@ -115,7 +114,7 @@ const updateUser = async (req: ExtendedRequest, res: Response) => {
             });
         }
 
-        await User.updateOne(
+        const newUser = await User.updateOne(
             { _id: id },
             {
                 first_name: first_name,
@@ -127,16 +126,15 @@ const updateUser = async (req: ExtendedRequest, res: Response) => {
             },
             { new: true }
         );
-        res.status(200).json({ message: "User updated successfully" });
+        return res.status(200).json({ message: "User updated successfully", newUser });
     } catch (err) {
-        res.status(500).json({ message: "Server error", err });
+        return res.status(500).json({ message: "Server error", err });
     }
 };
 
-const deleteUser = async (
+export const deleteUser = async (
     req: ExtendedRequest,
-    res: Response,
-    next: NextFunction
+    res: Response
 ) => {
     const { id } = req.params;
 
@@ -153,18 +151,9 @@ const deleteUser = async (
                 message: "You are not authorized to perform this action",
             });
         }
-        await User.updateOne({ _id: id }, { isDeleted: true });
+        await User.updateOne({ _id: id, isDeleted: false });
         res.status(200).json({ message: "User deleted successfully" });
     } catch (err) {
         res.status(500).json({ message: "Server error", err });
     }
-};
-
-export default {
-    createUser,
-    userLogin,
-    getUserByID,
-    updateUser,
-    deleteUser,
-    getToken,
 };

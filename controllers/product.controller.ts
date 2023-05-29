@@ -2,29 +2,30 @@ import { Request, Response } from "express";
 import { ProductModel } from "../models";
 import { ExtendedRequest } from "../types/user";
 
-const createProduct = async (req: ExtendedRequest, res: Response) => {
+export const createProduct = async (req: ExtendedRequest, res: Response) => {
     try {
         const product = await ProductModel.create({
             sellerID: req.user?.email,
             ...req.body,
         });
-        res.status(201).json({ message: "Product created", data: product });
+        return res.status(201).json({ message: "Product created", data: product });
     } catch (err) {
-        res.send(500).json({ message: "Server error", err });
+        return res.status(500).json({ message: "Server error", err });
     }
 };
 
-const getProductByID = async (req: Request, res: Response) => {
+export const getProductByID = async (req: Request, res: Response) => {
     const { id } = req.params;
     try {
-        const product = await ProductModel.findOne({ _id: id });
-        res.status(200).json({ message: "Product found", data: product });
+        const product = await ProductModel.findOne({ _id: id, isDeleted: false });
+        if (!product) return res.status(404).json({ message: "Product not found" });
+        return res.status(200).json({ message: "Product found", data: product });
     } catch (err) {
-        res.send(500).json({ message: "Server error", err });
+        return res.status(500).json({ message: "Server error", err });
     }
 };
 
-const getProducts = async (req: ExtendedRequest, res: Response) => {
+export const getProducts = async (req: ExtendedRequest, res: Response) => {
     const { email } = req.params;
     const { categoria = "", texto_busqueda = "" } = req.query;
     try {
@@ -41,47 +42,38 @@ const getProducts = async (req: ExtendedRequest, res: Response) => {
                 ],
             }
         );
-        res.status(200).send({ message: "Products found", data: products });
+        return res.status(200).send({ message: "Products found", data: products });
     } catch (err) {
-        res.status(500).send({ message: err });
+        return res.status(500).send({ message: err });
     }
 };
 
-const getProductsByCategory = async (req: Request, res: Response) => {
+export const getProductsByCategory = async (req: Request, res: Response) => {
     const { category } = req.params;
     try {
         const producsts = await ProductModel.find({ category: category });
-        res.status(200).json({ message: "Products found", data: producsts });
+        return res.status(200).json({ message: "Products found", data: producsts });
     } catch (err) {
-        res.send(500).json({ message: "Server error", err });
+        return res.status(500).json({ message: "Server error", err });
     }
 };
 
-const updateProduct = async (req: Request, res: Response) => {
+export const updateProduct = async (req: Request, res: Response) => {
     const { id } = req.params;
     try {
         await ProductModel.findOneAndUpdate({ _id: id }, req.body).exec();
-        res.status(200).json({ message: "Product updated" });
+        return res.status(200).json({ message: "Product updated" });
     } catch (err) {
-        res.send(500).json({ message: "Server error", err });
+        return res.status(500).json({ message: "Server error", err });
     }
 };
 
-const deleteProduct = async (req: Request, res: Response) => {
+export const deleteProduct = async (req: Request, res: Response) => {
     const { id } = req.params;
     try {
         await ProductModel.findOneAndDelete({ _id: id }).exec();
-        res.status(200).json({ message: "Product deleted" });
+        return res.status(200).json({ message: "Product deleted" });
     } catch (err) {
-        res.send(500).json({ message: "Server error", err });
+        return res.status(500).json({ message: "Server error", err });
     }
-};
-
-export default {
-    createProduct,
-    getProductByID,
-    getProducts,
-    getProductsByCategory,
-    updateProduct,
-    deleteProduct,
 };

@@ -35,3 +35,5 @@ mongoose
         console.log("There was an error with connection!");
         console.log(err);
     });
+
+export default app;
