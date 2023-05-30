@@ -34,7 +34,6 @@ export const verifyToken = (
             req.cookies.token,
             process.env.JWT_SECRET || "",
             (err: unknown, decoded: unknown) => {
-                console.log(err, decoded);
                 if (err) {
                     return res
                         .status(401)

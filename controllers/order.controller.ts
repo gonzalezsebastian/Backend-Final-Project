@@ -1,3 +1,4 @@
+import { start } from "repl";
 import { OrderModel } from "../models";
 import { Request, Response } from "express";
 
@@ -16,30 +17,33 @@ export const getOrderByID = async (req: Request, res: Response) => {
     try {
         const order = await OrderModel.find({ _id: id });
         if (order.length == 0) {
-            res.status(404).json({ message: "order not found" });
+            return res.status(404).json({ message: "order not found" });
         }
-        res.status(200).json({ data: order[0], message: "order details" });
+        return res.status(200).json({ data: order[0], message: "order details" });
     } catch (error) {
-        res.status(500).json({ message: "Server error", error });
+        console.log(error);
+        return res.status(500).json({ message: "Server error", error });
     }
 };
 
 export const getOrdersByEmail = async (req: Request, res: Response) => {
     const { email } = req.params;
-    const { startDate = new Date(0), endDate = new Date() } = req.query;
+    const { startDate = new Date(0).toISOString().split('T')[0], endDate = new Date().toISOString().split('T')[0] } = req.query;
     try {
-        const orders = await OrderModel.find({
+        const query = {
             $or: [
                 { email: email },
                 { created_at: { $gte: startDate, $lte: endDate } },
             ],
-        });
+        };
+        console.log(startDate, endDate);
+        const orders = await OrderModel.find(query);
         if (orders.length == 0) {
-            res.status(404).json({ message: "orders not found" });
+            return res.status(404).json({ message: "orders not found" });
         }
-        res.status(200).json({ data: orders, message: "orders list" });
+        return res.status(200).json({ data: orders, message: "orders list" });
     } catch (error) {
-        res.status(500).json({ message: "Server error", error });
+        return res.status(500).json({ message: "Server error", error });
     }
 };
 
@@ -48,9 +52,12 @@ export const updateOrder = async (req: Request, res: Response) => {
     const orderData = req.body;
     try {
         const newOrder = await OrderModel.findByIdAndUpdate(id, orderData);
-        res.status(200).json({ message: "order updated", order: newOrder });
+        if (!newOrder) {
+            return res.status(404).json({ message: "order not found" });
+        }
+        return res.status(200).json({ message: "order updated", order: newOrder });
     } catch (error) {
-        res.status(500).json({ message: "order not updated", error });
+        return res.status(500).json({ message: "order not updated", error });
     }
 };
 

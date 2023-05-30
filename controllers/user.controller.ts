@@ -79,6 +79,9 @@ export const getToken = async (req: ExtendedRequest, res: Response) => {
     const { email, password }: login = req.body;
     let token = null;
     try {
+        if (!email || !password) {
+            return res.status(400).json({ message: "Missing credentials" });
+        }
         token = generateToken({
             email: email,
             password: password,
@@ -93,6 +96,10 @@ export const updateUser = async (req: ExtendedRequest, res: Response) => {
     const { id } = req.params;
     try {
         const user = await User.findOne({ _id: id, isDeleted: false });
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
 
         if (!user) {
             return res.status(404).json({ message: "User not found" });

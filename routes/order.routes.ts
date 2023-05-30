@@ -8,7 +8,7 @@ router.post("/create", verifyToken, createOrder);
 
 router.get("/:id", verifyToken, getOrderByID);
 
-router.get("/:email", verifyToken, getOrdersByEmail);
+router.get("/user/:email", verifyToken, getOrdersByEmail);
 
 router.patch("/:id", verifyToken, updateOrder);
 

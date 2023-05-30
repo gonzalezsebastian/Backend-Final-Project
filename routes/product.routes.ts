@@ -8,7 +8,7 @@ router.post("/create", verifyToken, createProduct);
 
 router.get("/:id", getProductByID);
 
-router.get("/:email", getProducts);
+router.get("/user/:email", getProducts);
 
 router.get("/category/:category", getProductsByCategory);
 

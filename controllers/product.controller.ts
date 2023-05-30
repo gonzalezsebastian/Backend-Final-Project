@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { Request, Response } from "express";
 import { ProductModel } from "../models";
 import { ExtendedRequest } from "../types/user";
@@ -20,7 +21,7 @@ export const getProductByID = async (req: Request, res: Response) => {
     const { id } = req.params;
     try {
         const product = await ProductModel.findOne({
-            _id: id,
+            _id: new mongoose.Types.ObjectId(id),
             isDeleted: false,
         });
         if (!product)
@@ -89,7 +90,7 @@ export const deleteProduct = async (req: ExtendedRequest, res: Response) => {
             return res.status(404).json({ message: "Product not found" });
         }
 
-        await ProductModel.updateOne({ _id: id, isDeleted: false }).exec();
+        await ProductModel.updateOne({ _id: id}, { isDeleted: true }).exec();
         return res.status(200).json({ message: "Product deleted successfully" });
     } catch (err) {
         return res.status(500).json({ message: "Server error", err });
