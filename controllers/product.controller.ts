@@ -70,20 +70,30 @@ export const getProductsByCategory = async (req: Request, res: Response) => {
 export const updateProduct = async (req: Request, res: Response) => {
     const { id } = req.params;
     try {
-        await ProductModel.findOneAndUpdate({ _id: id }, req.body).exec();
+        const newProduct = await ProductModel.findOneAndUpdate({ _id: id }, req.body, { new: true });
+        if (!newProduct)
+            return res.status(404).json({ message: "Product not found" });
         return res.status(200).json({ message: "Product updated" });
     } catch (err) {
         return res.status(500).json({ message: "Server error", err });
     }
 };
 
-export const deleteProduct = async (req: Request, res: Response) => {
+export const deleteProduct = async (req: ExtendedRequest, res: Response) => {
     const { id } = req.params;
+
     try {
-        await ProductModel.findOneAndDelete({ _id: id }).exec();
-        return res.status(200).json({ message: "Product deleted" });
+        const product = await ProductModel.findOne({ _id: id, isDeleted: false });
+
+        if (!product) {
+            res.status(404).json({ message: "Product not found" });
+            return;
+        }
+
+        await ProductModel.updateOne({ _id: id, isDeleted: false });
+        res.status(200).json({ message: "Product deleted successfully" });
     } catch (err) {
-        return res.status(500).json({ message: "Server error", err });
+        res.status(500).json({ message: "Server error", err });
     }
 };
 

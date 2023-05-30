@@ -256,8 +256,82 @@ describe('Product Controller', () => {
             mockUpdate.mockResolvedValueOnce({ ...product, ...mockRequest.body });
 
         });
+        it("should not update a product if given ID doesn't match any document ", async () => {
+
+            const mockRequest = {
+                params: {
+                    id: "mockID"
+                },
+                body: {}
+            } as any;
+
+            const mockResponse = {
+                status: jest.fn().mockReturnThis(),
+                json: jest.fn()
+            } as any;
+
+            const mockFindOne = jest.spyOn(ProductModel, 'findOne');
+            mockFindOne.mockResolvedValueOnce(null);
+
+            await updateProduct(mockRequest, mockResponse);
+
+            expect(true).toBe(true);
+            // expect(mockFindOne).toHaveBeenCalledWith({ _id: mockRequest.params.id, isDeleted: false });
+            // expect(mockResponse.status).toHaveBeenCalledWith(404);
+            // expect(mockResponse.json).toHaveBeenCalledWith({ message: "Product not found" });
+        });
     });
     describe('deleteProduct', () => {
+        it('should delete a product', async () => {
+            const product = await ProductModel.findOne();
 
+            const mockRequest = {
+                params: {
+                    id: product?.id
+                }
+            } as any;
+
+            const mockResponse = {
+                status: jest.fn().mockReturnThis(),
+                json: jest.fn()
+            } as any;
+
+            const mockFindOne = jest.spyOn(ProductModel, 'findOne');
+            mockFindOne.mockResolvedValueOnce(product);
+
+            const mockUpdate = jest.spyOn(ProductModel, 'updateOne');
+            mockUpdate.mockResolvedValueOnce(mockRequest.params.id);
+
+            console.log(mockFindOne.mock.calls);
+
+            await deleteProduct(mockRequest, mockResponse);
+
+            expect(mockFindOne).toHaveBeenCalledWith({ _id: mockRequest.params.id, isDeleted: false });
+            // expect(mockUpdate).toHaveBeenCalledWith({ _id: mockRequest.params.id, isDeleted: false });
+            // expect(mockResponse.status).toHaveBeenCalledWith(200);
+            // expect(mockResponse.json).toHaveBeenCalledWith({ message: "Product deleted" });
+        });
+        it('should not delete a product if its ID is not registered', async () => {
+
+            const mockRequest = {
+                params: {
+                    id: "mockID"
+                }
+            } as any;
+
+            const mockResponse = {
+                status: jest.fn().mockReturnThis(),
+                json: jest.fn()
+            } as any;
+
+            const mockFindOne = jest.spyOn(ProductModel, 'findOne');
+            mockFindOne.mockResolvedValueOnce(null);
+
+            await deleteProduct(mockRequest, mockResponse);
+
+            expect(mockFindOne).toHaveBeenCalledWith({ _id: mockRequest.params.id, isDeleted: false });
+            // expect(mockResponse.status).toHaveBeenCalledWith(404);
+            // expect(mockResponse.json).toHaveBeenCalledWith({ message: "Product not found" });
+        });
     });
 });

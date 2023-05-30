@@ -42,14 +42,13 @@ export const userLogin = async (req: Request, res: Response) => {
         }
 
         const token = generateToken({
-            id: "" + user!._id,
             email: user!.email,
             password: user!.password,
         });
 
         return res
             .cookie("token", token, {
-                httpOnly: true,
+                httpOnly: false,
                 sameSite: "none",
                 secure: true,
             })
@@ -81,7 +80,6 @@ export const getToken = async (req: ExtendedRequest, res: Response) => {
     let token = null;
     try {
         token = generateToken({
-            id: "" + req.user!._id,
             email: email,
             password: password,
         });

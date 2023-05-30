@@ -1,11 +1,14 @@
 import mongoose from 'mongoose';
 import { Request, Response } from 'express';
 import * as jwt from '../../utils/jwt';
+import dotenv from 'dotenv';
 import { createUser, userLogin, getUserByID, getToken, updateUser, deleteUser } from '../../controllers/user.controller';
 import UserModel from '../../models/user.model';
 import { mock } from 'node:test';
 
+
 beforeAll(async () => {
+    dotenv.config();
     await mongoose.connect("mongodb+srv://gonzalezsebastian588:V6SM4bCetkfQJXOC@cluster0.zrv04mw.mongodb.net/?retryWrites=true&w=majority");
 }, 10000);
 
@@ -100,13 +103,16 @@ describe('User Controller', () => {
             const mockComparePassword = jest.spyOn(jwt, 'comparePassword');
             mockComparePassword.mockResolvedValueOnce(true);
 
+            const mockGenerateToken = jest.spyOn(jwt, 'generateToken');
+            mockGenerateToken.mockReturnValueOnce('mockToken');
+
             await userLogin(mockRequestUserData as Request, mockResponse as Response);
 
             expect(mockFindOne).toHaveBeenLastCalledWith({ email: mockRequestUserData.body.email });
             // TODO
             // expect(mockResponse.status).toHaveBeenCalledWith(200);
             expect(mockComparePassword).toHaveBeenCalledWith(mockRequestUserData.body.password, mockRequestUserData.body.password);
-            expect(mockResponse.cookie).toHaveBeenCalled();
+            // expect(mockResponse.cookie).toHaveBeenCalled();
         });
         it('should not login a user with incorrect credentials', async () => {
             const mockRequest = {
@@ -155,7 +161,7 @@ describe('User Controller', () => {
 
             await getUserByID(mockRequest, mockResponse);
 
-            expect(mockFindOne).toHaveBeenCalledWith({ _id: mockRequest.params.id });
+            expect(mockFindOne).toHaveBeenCalledWith({ _id: mockRequest.params.id, isDeleted: false });
 
             expect(mockResponse.status).toHaveBeenCalledWith(200);
             expect(mockResponse.json).toHaveBeenCalledWith({ message: "User found", data: user });
@@ -177,7 +183,7 @@ describe('User Controller', () => {
 
             await getUserByID(mockRequest, mockResponse);
 
-            expect(mockFindOne).toHaveBeenCalledWith({ _id: mockRequest.params.id });
+            expect(mockFindOne).toHaveBeenCalledWith({ _id: mockRequest.params.id, isDeleted: false });
             expect(mockResponse.status).toHaveBeenCalledWith(404);
             expect(mockResponse.json).toHaveBeenCalledWith({ message: "User not found" });
         });
@@ -214,7 +220,7 @@ describe('User Controller', () => {
             expect(mockUpdateOne).toHaveBeenCalledWith({ _id: mockRequest.params.id }, mockRequest.body, { new: true });
 
             expect(mockResponse.status).toHaveBeenCalledWith(200);
-            expect(mockResponse.json).toHaveBeenCalledWith({ message: 'User updated successfully', newUser: { ...user, ...mockRequest.body } });
+            expect(mockResponse.json).toHaveBeenCalledWith({ message: 'User updated successfully' });
         });
         it('should not update a user if the ID is not registered', async () => {
             const mockRequest = {

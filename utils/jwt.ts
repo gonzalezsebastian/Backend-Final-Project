@@ -14,7 +14,6 @@ export const comparePassword = async (
 };
 
 export const generateToken = (payload: {
-    id: string;
     email: string;
     password: string;
 }) => {
