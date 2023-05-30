@@ -9,7 +9,7 @@ import { mock } from 'node:test';
 
 beforeAll(async () => {
     dotenv.config();
-    await mongoose.connect("mongodb+srv://gonzalezsebastian588:V6SM4bCetkfQJXOC@cluster0.zrv04mw.mongodb.net/?retryWrites=true&w=majority");
+    await mongoose.connect(process.env.DATABASE || "");
 }, 10000);
 
 afterEach(async () => {

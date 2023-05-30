@@ -1,10 +1,12 @@
 import mongoose from 'mongoose';
+import dotenv from 'dotenv';
 import { Request, Response } from 'express';
 import { createOrder, getOrderByID, getOrdersByEmail, updateOrder } from '../../controllers/order.controller';
 import OrderModel from '../../models/order.model';
 
 beforeAll(async () => {
-    await mongoose.connect("mongodb+srv://gonzalezsebastian588:V6SM4bCetkfQJXOC@cluster0.zrv04mw.mongodb.net/?retryWrites=true&w=majority");
+    dotenv.config();
+    await mongoose.connect(process.env.DATABASE || "");
 }, 10000);
 
 afterEach(async () => {

@@ -1,9 +1,11 @@
 import mongoose from 'mongoose';
+import dotenv from 'dotenv';
 import { createProduct, getProductByID, getProducts, getProductsByCategory, updateProduct, deleteProduct } from '../../controllers/product.controller';
 import ProductModel from '../../models/product.model';
 
 beforeAll(async () => {
-    await mongoose.connect("mongodb+srv://gonzalezsebastian588:V6SM4bCetkfQJXOC@cluster0.zrv04mw.mongodb.net/?retryWrites=true&w=majority");
+    dotenv.config();
+    await mongoose.connect(process.env.DATABASE || "");
 }, 10000);
 
 afterEach(async () => {
@@ -270,12 +272,12 @@ describe('Product Controller', () => {
                 json: jest.fn()
             } as any;
 
-            const mockFindOne = jest.spyOn(ProductModel, 'findOne');
-            mockFindOne.mockResolvedValueOnce(null);
+            const mockFindById = jest.spyOn(ProductModel, 'findById');
+            mockFindById.mockResolvedValueOnce(undefined);
 
             await updateProduct(mockRequest, mockResponse);
 
-            expect(mockFindOne).toHaveBeenCalledWith({ _id: mockRequest.params.id, isDeleted: false });
+            expect(mockFindById).toHaveBeenCalledWith(mockRequest.params.id);
             expect(mockResponse.status).toHaveBeenCalledWith(404);
             expect(mockResponse.json).toHaveBeenCalledWith({ message: "Product not found" });
         });
@@ -304,9 +306,9 @@ describe('Product Controller', () => {
             await deleteProduct(mockRequest, mockResponse);
 
             expect(mockFindOne).toHaveBeenCalledWith({ _id: mockRequest.params.id, isDeleted: false });
-            // expect(mockUpdate).toHaveBeenCalledWith({ _id: mockRequest.params.id, isDeleted: false });
-            // expect(mockResponse.status).toHaveBeenCalledWith(200);
-            // expect(mockResponse.json).toHaveBeenCalledWith({ message: "Product deleted" });
+            expect(mockUpdate).toHaveBeenCalledWith({ _id: mockRequest.params.id}, { isDeleted: true });
+            expect(mockResponse.status).toHaveBeenCalledWith(200);
+            expect(mockResponse.json).toHaveBeenCalledWith({ message: "Product deleted successfully" });
         });
         it('should not delete a product if its ID is not registered', async () => {
 
@@ -327,8 +329,8 @@ describe('Product Controller', () => {
             await deleteProduct(mockRequest, mockResponse);
 
             expect(mockFindOne).toHaveBeenCalledWith({ _id: mockRequest.params.id, isDeleted: false });
-            // expect(mockResponse.status).toHaveBeenCalledWith(404);
-            // expect(mockResponse.json).toHaveBeenCalledWith({ message: "Product not found" });
+            expect(mockResponse.status).toHaveBeenCalledWith(404);
+            expect(mockResponse.json).toHaveBeenCalledWith({ message: "Product not found" });
         });
     });
 });
