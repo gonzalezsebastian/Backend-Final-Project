@@ -1,7 +1,6 @@
 import request from 'supertest';
 import mongoose from 'mongoose';
 import app from '../../app';
-import { orderController } from '../../controllers';
 
 beforeAll(async () => {
     await mongoose.connect("mongodb+srv://gonzalezsebastian588:V6SM4bCetkfQJXOC@cluster0.zrv04mw.mongodb.net/?retryWrites=true&w=majority");

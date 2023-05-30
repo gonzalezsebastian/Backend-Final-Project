@@ -1,17 +1,17 @@
 import { Router } from "express";
-import { userController } from "../controllers";
+import { createUser, getToken, getUserByID, updateUser, deleteUser, userLogin } from "../controllers/user.controller";
 import { isLogged } from "../middlewares/auth";
 
 const router = Router();
 
-router.post("/create", userController.createUser);
+router.post("/create", createUser);
 
-router.get("/jwt", userController.getToken);
+router.get("/jwt", getToken);
 
-router.get("/:id", userController.getUserByID);
+router.get("/:id", getUserByID);
 
-router.patch("/:id", isLogged, userController.updateUser);
+router.patch("/:id", isLogged, updateUser);
 
-router.delete("/:id", isLogged, userController.deleteUser);
+router.delete("/:id", isLogged, deleteUser);
 
 export default router;

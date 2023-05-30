@@ -1,19 +1,19 @@
-import { productController } from "../controllers";
+import { createProduct, getProductByID, getProducts, getProductsByCategory, updateProduct, deleteProduct } from "../controllers/product.controller";
 import { Router } from "express";
 import { isLogged } from "../middlewares/auth";
 
 const router = Router();
 
-router.post("/create", isLogged, productController.createProduct);
+router.post("/create", isLogged, createProduct);
 
-router.get("/:id", productController.getProductByID);
+router.get("/:id", getProductByID);
 
-router.get("/:email", productController.getProducts);
+router.get("/:email", getProducts);
 
-router.get("/category/:category", productController.getProductsByCategory);
+router.get("/category/:category", getProductsByCategory);
 
-router.patch("/:id", isLogged, productController.updateProduct);
+router.patch("/:id", isLogged, updateProduct);
 
-router.delete("/:id", isLogged, productController.deleteProduct);
+router.delete("/:id", isLogged, deleteProduct);
 
 export default router;

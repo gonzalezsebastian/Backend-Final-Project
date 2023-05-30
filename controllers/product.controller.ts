@@ -27,32 +27,33 @@ export const getProductByID = async (req: Request, res: Response) => {
 
 export const getProducts = async (req: ExtendedRequest, res: Response) => {
     const { email } = req.params;
-    const { categoria = "", texto_busqueda = "" } = req.query;
+    const { category = "", search_text = "" } = req.query;
     try {
         const products = await ProductModel.find(
             {
-                email: email,
-                nombre: { $regex: new RegExp(`${texto_busqueda}`, "i") },
-            },
-            {
+                sellerID: email,
                 $or: [
                     {
-                        categoria: { $regex: new RegExp(`${categoria}`, "i") },
+                        category: { $regex: new RegExp(`${category}`, "i") },
+                        name: { $regex: new RegExp(`${search_text}`, "i") },
                     },
                 ],
+                isDeleted: false,
             }
         );
-        return res.status(200).send({ message: "Products found", data: products });
+        if (products.length === 0) return res.status(404).json({ message: "Products not found" });
+        return res.status(200).json({ message: "Products found", data: products });
     } catch (err) {
-        return res.status(500).send({ message: err });
+        return res.status(500).json({ message: err });
     }
 };
 
 export const getProductsByCategory = async (req: Request, res: Response) => {
     const { category } = req.params;
     try {
-        const producsts = await ProductModel.find({ category: category });
-        return res.status(200).json({ message: "Products found", data: producsts });
+        const products = await ProductModel.find({ category: category, isDeleted: false });
+        if (products.length === 0) return res.status(404).json({ message: "Products not found" });
+        return res.status(200).json({ message: "Products found", data: products });
     } catch (err) {
         return res.status(500).json({ message: "Server error", err });
     }

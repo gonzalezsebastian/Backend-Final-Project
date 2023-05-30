@@ -14,7 +14,7 @@ export const comparePassword = async (
 };
 
 export const generateToken = (payload: login) => {
-    return jwt.sign(payload, "SECRET" || "", { expiresIn: "1h" });
+    return jwt.sign(payload, process.env.JWT_SECRET || "", { expiresIn: "1h" });
 };
 
 export const verifyToken = (req: ExtendedRequest, res: Response) => {
