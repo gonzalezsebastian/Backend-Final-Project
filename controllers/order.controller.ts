@@ -15,7 +15,7 @@ export const getOrderByID = async (req: Request, res: Response) => {
     const { id } = req.params;
     try {
         const order = await OrderModel.find({ _id: id });
-        if (order.length ==  0) {
+        if (order.length == 0) {
             res.status(404).json({ message: "order not found" });
         }
         res.status(200).json({ data: order[0], message: "order details" });
@@ -34,7 +34,7 @@ export const getOrdersByEmail = async (req: Request, res: Response) => {
                 { created_at: { $gte: startDate, $lte: endDate } },
             ],
         });
-        if (orders.length ==  0) {
+        if (orders.length == 0) {
             res.status(404).json({ message: "orders not found" });
         }
         res.status(200).json({ data: orders, message: "orders list" });
@@ -54,3 +54,4 @@ export const updateOrder = async (req: Request, res: Response) => {
     }
 };
 
+export default { createOrder, getOrderByID, getOrdersByEmail, updateOrder };

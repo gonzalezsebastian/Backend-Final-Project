@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { hash as a2Hash, verify as a2Verify } from "argon2";
 import * as jwt from "jsonwebtoken";
 import { login, user } from "../types/user";
@@ -10,31 +10,42 @@ export const comparePassword = async (
     password: string,
     hash: string
 ): Promise<boolean> => {
-    return await a2Verify(password, hash);
+    return await a2Verify(hash, password);
 };
 
-export const generateToken = (payload: login) => {
-    return jwt.sign(payload, "SECRET" || "", { expiresIn: "1h" });
+export const generateToken = (payload: {
+    id: string;
+    email: string;
+    password: string;
+}) => {
+    return jwt.sign(payload, process.env.JWT_SECRET || "", { expiresIn: "1h" });
 };
 
-export const verifyToken = (req: ExtendedRequest, res: Response) => {
+export const verifyToken = (
+    req: ExtendedRequest,
+    res: Response,
+    next: NextFunction
+) => {
     if (!req.cookies?.token) {
-        return res
-            .status(401)
-            .json({ message: "Unauthorized. Accept cookies" });
+        return res.status(401).json({ message: "Unauthorized" });
     }
 
-    jwt.verify(
-        req.cookies.token,
-        process.env.JWT_SECRET || "",
-        (err: unknown, decoded: unknown) => {
-            if (err) {
-                return res
-                    .status(401)
-                    .json({ message: "Unauthorized. Invalid token" });
+    try {
+        jwt.verify(
+            req.cookies.token,
+            process.env.JWT_SECRET || "",
+            (err: unknown, decoded: unknown) => {
+                console.log(err, decoded);
+                if (err) {
+                    return res
+                        .status(401)
+                        .json({ message: "Unauthorized. Invalid token" });
+                }
+                req.user = decoded as user;
             }
-
-            req.user = decoded as user;
-        }
-    );
+        );
+        next();
+    } catch (err) {
+        return res.status(500).json({ message: "Server error", err });
+    }
 };
