@@ -302,14 +302,12 @@ describe('Product Controller', () => {
             const mockUpdate = jest.spyOn(ProductModel, 'updateOne');
             mockUpdate.mockResolvedValueOnce(mockRequest.params.id);
 
-            console.log(mockFindOne.mock.calls);
-
             await deleteProduct(mockRequest, mockResponse);
 
             expect(mockFindOne).toHaveBeenCalledWith({ _id: mockRequest.params.id, isDeleted: false });
-            // expect(mockUpdate).toHaveBeenCalledWith({ _id: mockRequest.params.id, isDeleted: false });
-            // expect(mockResponse.status).toHaveBeenCalledWith(200);
-            // expect(mockResponse.json).toHaveBeenCalledWith({ message: "Product deleted" });
+            expect(mockUpdate).toHaveBeenCalledWith({ _id: mockRequest.params.id, isDeleted: false });
+            expect(mockResponse.status).toHaveBeenCalledWith(200);
+            expect(mockResponse.json).toHaveBeenCalledWith({ message: "Product deleted" });
         });
         it('should not delete a product if its ID is not registered', async () => {
 

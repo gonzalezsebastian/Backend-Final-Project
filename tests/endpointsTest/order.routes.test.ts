@@ -1,6 +1,7 @@
 import request from 'supertest';
 import mongoose from 'mongoose';
 import app from '../../app';
+import * as jwt from '../../utils/jwt';
 
 beforeAll(async () => {
     await mongoose.connect("mongodb+srv://gonzalezsebastian588:V6SM4bCetkfQJXOC@cluster0.zrv04mw.mongodb.net/?retryWrites=true&w=majority");
@@ -17,11 +18,8 @@ afterAll(async () => {
 describe('Order Routes', () => {
     describe('POST /orders/create', () => {
         it('should create an order', async () => {
-            await request(app).post('/users/login').send({
-                email: "x@c.com",
-                password: "35"
-            });
-            const orderResponse = await request(app).post('/orders/create').send({
+            const token = jwt.generateToken({ email: 'x@c.com', password: '35' });
+            const orderResponse = await request(app).post('/orders/create').set('Cookie',  `token=${token}`).send({
                 email: "mockEmail@gmail.com",
                 products: [
                     {

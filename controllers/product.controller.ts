@@ -86,14 +86,13 @@ export const deleteProduct = async (req: ExtendedRequest, res: Response) => {
         const product = await ProductModel.findOne({ _id: id, isDeleted: false });
 
         if (!product) {
-            res.status(404).json({ message: "Product not found" });
-            return;
+            return res.status(404).json({ message: "Product not found" });
         }
 
-        await ProductModel.updateOne({ _id: id, isDeleted: false });
-        res.status(200).json({ message: "Product deleted successfully" });
+        await ProductModel.updateOne({ _id: id, isDeleted: false }).exec();
+        return res.status(200).json({ message: "Product deleted successfully" });
     } catch (err) {
-        res.status(500).json({ message: "Server error", err });
+        return res.status(500).json({ message: "Server error", err });
     }
 };
 
