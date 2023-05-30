@@ -71,9 +71,13 @@ export const getProductsByCategory = async (req: Request, res: Response) => {
 export const updateProduct = async (req: Request, res: Response) => {
     const { id } = req.params;
     try {
-        const newProduct = await ProductModel.findOneAndUpdate({ _id: id }, req.body, { new: true });
-        if (!newProduct)
+        const product = await ProductModel.findOne({ _id: id, isDeleted: false });
+
+        if (!product) {
             return res.status(404).json({ message: "Product not found" });
+        }
+
+        await ProductModel.updateOne({ _id: id }, req.body);
         return res.status(200).json({ message: "Product updated" });
     } catch (err) {
         return res.status(500).json({ message: "Server error", err });
@@ -90,7 +94,7 @@ export const deleteProduct = async (req: ExtendedRequest, res: Response) => {
             return res.status(404).json({ message: "Product not found" });
         }
 
-        await ProductModel.updateOne({ _id: id}, { isDeleted: true }).exec();
+        await ProductModel.updateOne({ _id: id }, { isDeleted: true }).exec();
         return res.status(200).json({ message: "Product deleted successfully" });
     } catch (err) {
         return res.status(500).json({ message: "Server error", err });

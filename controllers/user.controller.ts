@@ -47,12 +47,12 @@ export const userLogin = async (req: Request, res: Response) => {
         });
 
         return res
+            .status(200)
             .cookie("token", token, {
                 httpOnly: false,
                 sameSite: "none",
                 secure: true,
             })
-            .status(200)
             .json({ message: "User logged in successfully" });
     } catch (err) {
         return res.status(500).json({ message: "Server error", err });

@@ -109,10 +109,9 @@ describe('User Controller', () => {
             await userLogin(mockRequestUserData as Request, mockResponse as Response);
 
             expect(mockFindOne).toHaveBeenLastCalledWith({ email: mockRequestUserData.body.email });
-            // TODO
-            // expect(mockResponse.status).toHaveBeenCalledWith(200);
+            expect(mockResponse.status).toHaveBeenCalledWith(200);
             expect(mockComparePassword).toHaveBeenCalledWith(mockRequestUserData.body.password, mockRequestUserData.body.password);
-            // expect(mockResponse.cookie).toHaveBeenCalled();
+            expect(mockResponse.cookie).toHaveBeenCalled();
         });
         it('should not login a user with incorrect credentials', async () => {
             const mockRequest = {

@@ -260,7 +260,7 @@ describe('Product Controller', () => {
 
             const mockRequest = {
                 params: {
-                    id: "mockID"
+                    id: "111111111111111111111111"
                 },
                 body: {}
             } as any;
@@ -275,10 +275,9 @@ describe('Product Controller', () => {
 
             await updateProduct(mockRequest, mockResponse);
 
-            expect(true).toBe(true);
-            // expect(mockFindOne).toHaveBeenCalledWith({ _id: mockRequest.params.id, isDeleted: false });
-            // expect(mockResponse.status).toHaveBeenCalledWith(404);
-            // expect(mockResponse.json).toHaveBeenCalledWith({ message: "Product not found" });
+            expect(mockFindOne).toHaveBeenCalledWith({ _id: mockRequest.params.id, isDeleted: false });
+            expect(mockResponse.status).toHaveBeenCalledWith(404);
+            expect(mockResponse.json).toHaveBeenCalledWith({ message: "Product not found" });
         });
     });
     describe('deleteProduct', () => {
