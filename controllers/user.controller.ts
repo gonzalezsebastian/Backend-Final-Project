@@ -37,20 +37,22 @@ export const userLogin = async (req: Request, res: Response) => {
         const isPasswordValid = await comparePassword(password, user!.password);
         if (!isPasswordValid) {
             return res.status(401).json({
-                message: "Invalid credentials"
+                message: "Invalid credentials",
             });
         }
 
         const token = generateToken({
+            id: "" + user!._id,
             email: user!.email,
             password: user!.password,
         });
 
-        return res.cookie("token", token, {
-            httpOnly: true,
-            sameSite: "none",
-            secure: true,
-        })
+        return res
+            .cookie("token", token, {
+                httpOnly: true,
+                sameSite: "none",
+                secure: true,
+            })
             .status(200)
             .json({ message: "User logged in successfully" });
     } catch (err) {
@@ -62,7 +64,7 @@ export const getUserByID = async (req: Request, res: Response) => {
     const { id } = req.params;
 
     try {
-        const user = await User.findOne({ _id: id });
+        const user = await User.findOne({ _id: id, isDeleted: false });
 
         if (!user) {
             return res.status(404).json({ message: "User not found" });
@@ -79,33 +81,23 @@ export const getToken = async (req: ExtendedRequest, res: Response) => {
     let token = null;
     try {
         token = generateToken({
+            id: "" + req.user!._id,
             email: email,
             password: password,
         });
     } catch (err) {
-        return res.status(500).json({ message: "Server error", err });
+        res.status(500).json({ message: "Server error", err });
     }
     return res.status(200).json({ message: "Token generated", token: token });
 };
 
 export const updateUser = async (req: ExtendedRequest, res: Response) => {
     const { id } = req.params;
-    const {
-        first_name,
-        second_name,
-        email,
-        password,
-        phone,
-        address,
-    }: updateUserType = req.body;
-
     try {
         const user = await User.findOne({ _id: id, isDeleted: false });
 
         if (!user) {
-            return res
-                .status(404)
-                .json({ message: "User not found" });
+            return res.status(404).json({ message: "User not found" });
         }
 
         if (req.user?.email !== user.email) {
@@ -113,29 +105,20 @@ export const updateUser = async (req: ExtendedRequest, res: Response) => {
                 message: "You are not authorized to perform this action",
             });
         }
-
-        const newUser = await User.updateOne(
-            { _id: id },
-            {
-                first_name: first_name,
-                second_name: second_name,
-                email: email,
-                password: password,
-                phone: phone,
-                address: address,
-            },
-            { new: true }
-        );
-        return res.status(200).json({ message: "User updated successfully", newUser });
+        try {
+            await User.updateOne({ _id: id }, req.body, {
+                new: true,
+            });
+        } catch (err) {
+            return res.status(500).json({ message: "Error updating", err });
+        }
+        return res.status(200).json({ message: "User updated successfully" });
     } catch (err) {
         return res.status(500).json({ message: "Server error", err });
     }
 };
 
-export const deleteUser = async (
-    req: ExtendedRequest,
-    res: Response
-) => {
+export const deleteUser = async (req: ExtendedRequest, res: Response) => {
     const { id } = req.params;
 
     try {
@@ -156,4 +139,13 @@ export const deleteUser = async (
     } catch (err) {
         res.status(500).json({ message: "Server error", err });
     }
+};
+
+export default {
+    createUser,
+    userLogin,
+    getUserByID,
+    getToken,
+    updateUser,
+    deleteUser,
 };

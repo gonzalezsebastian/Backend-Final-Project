@@ -1,15 +1,15 @@
 import { Router } from "express";
 import { createOrder, getOrderByID, getOrdersByEmail, updateOrder } from "../controllers/order.controller";
-import { isLogged } from "../middlewares/auth";
+import { verifyToken } from "../utils/jwt";
 
 const router = Router();
 
-router.post("/create", isLogged, createOrder);
+router.post("/create", verifyToken, createOrder);
 
-router.get("/:id", isLogged, getOrderByID);
+router.get("/:id", verifyToken, getOrderByID);
 
-router.get("/:email", isLogged, getOrdersByEmail);
+router.get("/:email", verifyToken, getOrdersByEmail);
 
-router.patch("/:id", isLogged, updateOrder);
+router.patch("/:id", verifyToken, updateOrder);
 
 export default router;

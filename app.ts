@@ -1,3 +1,6 @@
+// @ts-ignore
+import cookieParser from "cookie-parser";
+
 import express from "express";
 import mongoose, { ConnectOptions } from "mongoose";
 import dotenv from "dotenv";
@@ -12,6 +15,7 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 app.listen(port, () => {
     console.log(`Server running on port http://localhost:${port}`);
