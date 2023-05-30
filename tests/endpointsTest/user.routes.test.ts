@@ -7,7 +7,6 @@ import * as jwt from '../../utils/jwt';
 
 beforeAll(async () => {
     dotenv.config();
-    UserModel.deleteMany();
     await mongoose.connect(process.env.DATABASE || "");
 }, 10000);
 
@@ -16,8 +15,8 @@ afterEach(async () => {
 });
 
 afterAll(async () => {
+    await UserModel.updateMany({ isDeleted: true }, { isDeleted: false });
     await mongoose.disconnect();
-    UserModel.deleteMany();
 });
 
 describe("Users endpoints", () => {

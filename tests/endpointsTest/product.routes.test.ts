@@ -7,7 +7,6 @@ import * as jwt from '../../utils/jwt';
 
 beforeAll(async () => {
     dotenv.config();
-    ProductModel.deleteMany();
     await mongoose.connect(process.env.DATABASE || "");
 }, 10000);
 
@@ -16,9 +15,8 @@ afterEach(async () => {
 });
 
 afterAll(async () => {
+    await ProductModel.updateMany({ isDeleted: true }, { isDeleted: false });
     await mongoose.disconnect();
-    ProductModel.deleteMany();
-    ProductModel.updateMany({ isDeleted: true }, { isDeleted: false });
 });
 
 describe('Product Routes', () => {
@@ -49,7 +47,7 @@ describe('Product Routes', () => {
     });
     describe('GET /products/:id', () => {
         it('should get a product', async () => {
-            const response = await request(app).get('/products/64757d33b203c000dde18ec1');
+            const response = await request(app).get('/products/647586d1ada7ae64772bfcf3');
             expect(response.status).toBe(200);
         });
         it('should not get a product if the product does not exist', async () => {
@@ -57,16 +55,16 @@ describe('Product Routes', () => {
             expect(response.status).toBe(404);
         });
     });
-    // describe('GET /products/user/:email', () => {
-    //     it('should get products by user', async () => {
-    //         const response = await request(app).get('/products/users/x@c.com?category=categoryP1');
-    //         expect(response.status).toBe(200);
-    //     });
-    //     it('should not get products by user if the user does not exist', async () => {
-    //         const response = await request(app).get('/products/users/xxxxxx@xxx.com?category=categoryP1');
-    //         expect(response.status).toBe(404);
-    //     });
-    // });
+    describe('GET /products/user/:email', () => {
+        it('should get products by user', async () => {
+            const response = await request(app).get('/products/user/x@c.com?category=categoryP1');
+            expect(response.status).toBe(200);
+        });
+        it('should not get products by user if the user does not exist', async () => {
+            const response = await request(app).get('/products/users/xxxxxx@xxx.com?category=categoryP1');
+            expect(response.status).toBe(404);
+        });
+    });
     describe('GET /category/:category', () => {
         it('should get products by category', async () => {
             const response = await request(app).get('/products/category/categoryP1');
@@ -80,7 +78,7 @@ describe('Product Routes', () => {
     describe('PATCH /products/:id', () => {
         it('should update a product', async () => {
             const token = jwt.generateToken({ email: 'x@c.com', password: '35' });
-            const response = await request(app).patch('/products/64757d33b203c000dde18ec1').set('Cookie', `token=${token}`).send({
+            const response = await request(app).patch('/products/647586d1ada7ae64772bfcf3').set('Cookie', `token=${token}`).send({
                 name: "p2"
             });
             expect(response.status).toBe(200);
@@ -96,7 +94,7 @@ describe('Product Routes', () => {
     describe('DELETE /products/:id', () => {
         it('should delete a product', async () => {
             const token = jwt.generateToken({ email: 'x@c.com', password: '35' });
-            const response = await request(app).delete('/products/64757d33b203c000dde18ec1').set('Cookie', `token=${token}`);
+            const response = await request(app).delete('/products/647586d1ada7ae64772bfcf3').set('Cookie', `token=${token}`);
             expect(response.status).toBe(200);
         });
         it('should not delete a product that doesn\'t exist', async () => { 

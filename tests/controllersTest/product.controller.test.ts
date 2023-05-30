@@ -87,14 +87,14 @@ describe('Product Controller', () => {
 
             await getProductByID(mockRequest, mockResponse);
 
-            expect(mockFindOne).toHaveBeenCalledWith({ _id: mockRequest.params.id, isDeleted: false });
+            expect(mockFindOne).toHaveBeenCalledWith({ _id: new mongoose.Types.ObjectId(mockRequest.params.id), isDeleted: false });
             expect(mockResponse.status).toHaveBeenCalledWith(200);
             expect(mockResponse.json).toHaveBeenCalledWith({ message: "Product found", data: product });
         });
         it('should not retrieve any product in case there is no product with the given ID', async () => {
             const mockRequest = {
                 params: {
-                    id: "mockID"
+                    id: "111111111111111111111111"
                 }
             } as any;
 
@@ -108,7 +108,7 @@ describe('Product Controller', () => {
 
             await getProductByID(mockRequest, mockResponse);
 
-            expect(mockFindOne).toHaveBeenCalledWith({ _id: mockRequest.params.id, isDeleted: false });
+            expect(mockFindOne).toHaveBeenCalledWith({ _id: new mongoose.Types.ObjectId(mockRequest.params.id), isDeleted: false });
             expect(mockResponse.status).toHaveBeenCalledWith(404);
             expect(mockResponse.json).toHaveBeenCalledWith({ message: "Product not found" });
         });
